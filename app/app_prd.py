@@ -14,7 +14,7 @@ def cargar_modelo(path_modelo):
         modelo = pickle.load(f)
     return modelo
 
-modelo = cargar_modelo("modelo_lightgbm_final.pkl")
+modelo = cargar_modelo("modelo_lightgbm_final_bkp.pkl")
 
 # === Subir archivo ===
 archivo = st.file_uploader("📤 Sube un archivo .parquet con tus datos", type=["parquet"])
@@ -40,7 +40,7 @@ if archivo:
     })
 
     # === Predicción ===
-    X_test = datos.drop(["codebelista", "clase", "aniocampana"], axis=1)
+    X_test = datos.drop(["codvendedora", "clase", "aniocampana"], axis=1)
     X_test = X_test.apply(pd.to_numeric, errors='coerce').fillna(0)
     probs = modelo.predict(X_test)
 
@@ -101,35 +101,7 @@ if archivo:
         labels={"codzona_x": "Zona", "conteo": "Cantidad"}
     )
     st.plotly_chart(fig2, use_container_width=True)
-    ############### COMENTADO
-    #st.subheader("Perfiles de riesgo por zona (gráfico horizontal)")
-
-    # === Filtros ===
-    #zonas_disponibles = sorted(datos_filtrados["codzona_x"].unique())
-    #perfiles_disponibles = sorted(datos_filtrados["Perfil_Riesgo"].unique())
-#
-    #zonas_seleccionadas = st.multiselect("Selecciona zonas", zonas_disponibles, default=zonas_disponibles)
-    #perfiles_seleccionados = st.multiselect("Selecciona perfiles de riesgo", perfiles_disponibles, default=perfiles_disponibles)
-#
-    #datos_graf = datos_filtrados[
-    #    datos_filtrados["codzona_x"].isin(zonas_seleccionadas) &
-    #    datos_filtrados["Perfil_Riesgo"].isin(perfiles_seleccionados)
-    #]
-
-    #conteo = datos_graf.groupby(["codzona_x", "Perfil_Riesgo"]).size().reset_index(name="conteo")
-#
-    #fig2 = px.bar(
-    #    conteo,
-    #    y="codzona_x",
-    #    x="conteo",
-    #    color="Perfil_Riesgo",
-    #    barmode="group",
-    #    orientation="h",
-    #    title="Cantidad de perfiles de riesgo por zona",
-    #    labels={"codzona_x": "Zona", "conteo": "Cantidad"}
-    #)
-    #st.plotly_chart(fig2, use_container_width=True)
-
+    
     # === Descargar resultados ===
     csv = datos_filtrados.to_csv(index=False).encode("utf-8")
     st.download_button(
